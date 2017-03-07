@@ -33,25 +33,6 @@ EXTRA_DIST = python.i util.i extra.i extracomments.i except.i \
 	replicationtest2.py \
 	$(TESTS) $(BUILT_SOURCES)
 
-pkgpylibdir = @PYTHON_LIB@/xapian
-
-# Install as _DATA rather than _SCRIPTS because we don't want to make these
-# executable (they don't have a #! line).
-pkgpylib_DATA = xapian/__init__.py xapian/__init__.pyc xapian/__init__.pyo
-
-pkgpylib_LTLIBRARIES = _xapian.la
-
-# Remove the .la file - _xapian.la is never linked against (it's a module)
-# and Python doesn't use libltdl.  Note that the library gets installed by
-# install-data, so that's where we need to hook.
-install-data-hook:
-	rm -f $(DESTDIR)$(pkgpylibdir)/_xapian.la
-
-# Because we don't install the .la file, "make uninstall" doesn't work and
-# we need to remove the file ourselves.
-uninstall-local:
-	rm -f $(DESTDIR)$(pkgpylibdir)/_xapian$(PYTHON_SO)
-
 AM_CPPFLAGS = -I$(PYTHON_INC)
 AM_CXXFLAGS = $(SWIG_CXXFLAGS) $(XAPIAN_CXXFLAGS)
 _xapian_la_LDFLAGS = -avoid-version -module -shrext "$(PYTHON_SO)" $(NO_UNDEFINED)
@@ -125,7 +106,7 @@ $(stamp): except.i doccomments.i
 	-test -d modern || mkdir modern
 	$(multitarget_begin)
 	$(RUN_SWIG) $(SWIG_WERROR) -I. -I'$(srcdir)' $(SWIG_FLAGS) -c++ \
-	    -go -O -outdir modern \
+	    -go -intgosize 64 -O -outdir modern \
 	    -o modern/xapian_wrap.cc '$(srcdir)/'go.i
 	$(PERL) -pi -e 's/class Error:/class Error(Exception):/' modern/xapian.go
 	$(multitarget_end)
