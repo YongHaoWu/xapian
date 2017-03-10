@@ -106,7 +106,7 @@ $(stamp): except.i doccomments.i
 	-test -d modern || mkdir modern
 	$(multitarget_begin)
 	$(RUN_SWIG) $(SWIG_WERROR) -I. -I'$(srcdir)' $(SWIG_FLAGS) -c++ \
-	    -go -intgosize 64 -O -outdir modern \
+	     -cgo -go -intgosize 64 -O -outdir modern \
 	    -o modern/xapian_wrap.cc '$(srcdir)/'go.i
 	$(PERL) -pi -e 's/class Error:/class Error(Exception):/' modern/xapian.go
 	$(multitarget_end)
